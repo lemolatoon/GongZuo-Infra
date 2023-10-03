@@ -84,7 +84,7 @@ fn main() {
 
     let (salt, hashed_password) = derive(password).unwrap();
 
-    let sql = format!("INSERT INTO users (username, password, salt) VALUES ('{}', '{}', '{}');", username, hashed_password, salt);
+    let sql = format!("INSERT INTO users (username, password, salt, is_admin) VALUES ('{}', '{}', '{}', true);", username, hashed_password, salt);
 
     let init_admin_path = path::Path::new("scripts/1_init_admin.sql");
     let mut file = fs::File::create(init_admin_path).unwrap();

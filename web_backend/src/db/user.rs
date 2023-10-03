@@ -10,4 +10,5 @@ pub struct User {
     pub created_at: NaiveDateTime,
     #[sqlx(default)]
     pub session_token: Option<String>,
+    pub is_admin: bool,
 }

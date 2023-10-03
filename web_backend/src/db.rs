@@ -107,4 +107,19 @@ impl DB {
 
         Ok(user)
     }
+
+    pub async fn ensure_admin_user_is_registered(&self, username: &str) -> anyhow::Result<bool> {
+        let user: Option<User> = sqlx::query_as!(
+            User,
+            r#"
+            SELECT * FROM users
+            WHERE username = $1 AND is_admin = true
+            "#,
+            username
+        )
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(user.is_some())
+    }
 }

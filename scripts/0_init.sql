@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     salt VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE,
     session_token VARCHAR(255) UNIQUE
 );
 

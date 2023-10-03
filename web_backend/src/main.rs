@@ -36,6 +36,11 @@ async fn main() {
 
     let db = db::DB::new(pool);
 
+    let is_registered = db.ensure_admin_user_is_registered("admin").await.unwrap();
+    if !is_registered {
+        panic!("Admin user is not registered");
+    }
+
     let app = Router::new()
         .route("/", get(|| async { "Hello, world! from '/'" }))
         .route("/users", get(users))
@@ -46,7 +51,7 @@ async fn main() {
 
     let port = std::env::var("PORT")
         .map_or(None, |p| p.parse().ok())
-        .unwrap_or(3000);
+        .unwrap_or(3001);
     // run it with hyper
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
     println!("Listening on {}", &addr);
