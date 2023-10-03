@@ -3,7 +3,7 @@ use axum::{
     Router,
 };
 
-use crate::{db, handlers};
+use crate::{db, handlers, router};
 
 pub fn app_router(db: db::DB) -> Router {
     Router::new()
@@ -12,5 +12,6 @@ pub fn app_router(db: db::DB) -> Router {
         .route("/register", post(handlers::register::register))
         .route("/login", post(handlers::login::login))
         .route("/logout", post(handlers::logout::logout))
+        .nest("/gongzuo", router::gongzuo::gongzuo_router())
         .with_state(db)
 }
