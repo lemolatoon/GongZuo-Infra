@@ -2,7 +2,10 @@ use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use serde::Deserialize;
 use serde_json::json;
 
-use crate::{db::DB, error::Result};
+use crate::{
+    db::{user::UserHandlerTrait, DB},
+    error::Result,
+};
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct LogoutPayload {
@@ -15,7 +18,11 @@ pub async fn logout(
 ) -> Result<impl IntoResponse> {
     let LogoutPayload { session_token } = payload;
 
-    let Some(user) = db.ensure_session_token(&session_token).await? else {
+    let Some(user) = db
+        .user_handler()
+        .ensure_session_token(&session_token)
+        .await?
+    else {
         return Ok((
             StatusCode::UNAUTHORIZED,
             Json(json!({
@@ -24,7 +31,7 @@ pub async fn logout(
         ));
     };
 
-    db.remove_session_token(user.id).await?;
+    db.user_handler().remove_session_token(user.id).await?;
 
     Ok((
         StatusCode::OK,

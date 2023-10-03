@@ -13,6 +13,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
+use db::user::UserHandlerTrait;
 use db::DB;
 use error::Result;
 use once_cell::sync::Lazy;
@@ -37,7 +38,11 @@ async fn main() {
 
     let db = db::DB::new(pool);
 
-    let is_registered = db.ensure_admin_user_is_registered("admin").await.unwrap();
+    let is_registered = db
+        .user_handler()
+        .ensure_admin_user_is_registered("admin")
+        .await
+        .unwrap();
     if !is_registered {
         panic!("Admin user is not registered");
     }
@@ -63,6 +68,6 @@ async fn main() {
 }
 
 pub async fn users(State(db): State<DB>) -> Result<impl IntoResponse> {
-    let users = db.users().await?;
+    let users = db.user_handler().users().await?;
     Ok(Json(users))
 }

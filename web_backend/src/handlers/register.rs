@@ -2,7 +2,10 @@ use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use serde::Deserialize;
 use serde_json::json;
 
-use crate::{db::DB, error::AppError};
+use crate::{
+    db::{user::UserHandlerTrait, DB},
+    error::AppError,
+};
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct UserPayload {
@@ -16,7 +19,7 @@ pub async fn register(
 ) -> Result<impl IntoResponse, AppError> {
     let UserPayload { username, password } = payload;
 
-    let user = db.get_user_by_username(&username).await?;
+    let user = db.user_handler().get_user_by_username(&username).await?;
 
     if user.is_some() {
         return Ok((
@@ -29,7 +32,9 @@ pub async fn register(
 
     let (salt, hashed_password) = crate::password::derive(password)?;
 
-    db.register_user(&username, &hashed_password, &salt).await?;
+    db.user_handler()
+        .register_user(&username, &hashed_password, &salt)
+        .await?;
 
     Ok((
         StatusCode::CREATED,

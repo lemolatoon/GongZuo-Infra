@@ -4,7 +4,7 @@ use axum::{response::IntoResponse, Json};
 use serde::Deserialize;
 use serde_json::json;
 
-use crate::db::user::User;
+use crate::db::user::{User, UserHandlerTrait};
 use crate::db::DB;
 use crate::error::Result;
 use crate::password;
@@ -22,7 +22,7 @@ pub async fn login(
 ) -> Result<impl IntoResponse> {
     let LoginPayload { username, password } = payload;
 
-    let Some(user) = db.get_user_by_username(&username).await? else {
+    let Some(user) = db.user_handler().get_user_by_username(&username).await? else {
         return Err(anyhow::anyhow!("User {} not found", &username).into());
     };
 
@@ -41,7 +41,9 @@ pub async fn login(
             Some(session_token) => session_token,
             None => {
                 let session_token = create_session_token();
-                db.update_session_token(user_id, &session_token).await?;
+                db.user_handler()
+                    .update_session_token(user_id, &session_token)
+                    .await?;
 
                 session_token
             }
