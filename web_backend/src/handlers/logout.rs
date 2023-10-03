@@ -1,4 +1,4 @@
-use axum::{http::StatusCode, response::IntoResponse, Extension, Json};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use serde::Deserialize;
 use serde_json::json;
 
@@ -10,7 +10,7 @@ pub struct LogoutPayload {
 }
 
 pub async fn logout(
-    Extension(db): Extension<DB>,
+    State(db): State<DB>,
     Json(payload): Json<LogoutPayload>,
 ) -> Result<impl IntoResponse> {
     let LogoutPayload { session_token } = payload;

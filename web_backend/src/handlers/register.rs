@@ -1,4 +1,4 @@
-use axum::{http::StatusCode, response::IntoResponse, Extension, Json};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use serde::Deserialize;
 use serde_json::json;
 
@@ -11,7 +11,7 @@ pub struct UserPayload {
 }
 
 pub async fn register(
-    Extension(db): Extension<DB>,
+    State(db): State<DB>,
     Json(payload): Json<UserPayload>,
 ) -> Result<impl IntoResponse, AppError> {
     let UserPayload { username, password } = payload;

@@ -1,5 +1,6 @@
+use axum::extract::State;
 use axum::http::StatusCode;
-use axum::{response::IntoResponse, Extension, Json};
+use axum::{response::IntoResponse, Json};
 use serde::Deserialize;
 use serde_json::json;
 
@@ -16,7 +17,7 @@ pub struct LoginPayload {
 }
 
 pub async fn login(
-    Extension(db): Extension<DB>,
+    State(db): State<DB>,
     Json(payload): Json<LoginPayload>,
 ) -> Result<impl IntoResponse> {
     let LoginPayload { username, password } = payload;

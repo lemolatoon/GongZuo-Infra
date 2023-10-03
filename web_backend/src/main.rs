@@ -8,9 +8,10 @@ use std::net::SocketAddr;
 
 use axum::{
     self,
+    extract::State,
     response::IntoResponse,
     routing::{get, post},
-    Extension, Json, Router,
+    Json, Router,
 };
 use db::DB;
 use error::Result;
@@ -47,7 +48,7 @@ async fn main() {
         .route("/register", post(handlers::register::register))
         .route("/login", post(handlers::login::login))
         .route("/logout", post(handlers::logout::logout))
-        .layer(Extension(db));
+        .with_state(db);
 
     let port = std::env::var("PORT")
         .map_or(None, |p| p.parse().ok())
@@ -61,7 +62,7 @@ async fn main() {
         .unwrap();
 }
 
-pub async fn users(Extension(db): Extension<DB>) -> Result<impl IntoResponse> {
+pub async fn users(State(db): State<DB>) -> Result<impl IntoResponse> {
     let users = db.users().await?;
     Ok(Json(users))
 }
