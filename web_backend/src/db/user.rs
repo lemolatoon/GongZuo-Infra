@@ -8,4 +8,6 @@ pub struct User {
     pub password: String,
     pub salt: String,
     pub created_at: NaiveDateTime,
+    #[sqlx(default)]
+    pub session_token: Option<String>,
 }

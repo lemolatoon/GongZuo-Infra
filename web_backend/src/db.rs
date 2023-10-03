@@ -57,4 +57,39 @@ impl DB {
 
         Ok(())
     }
+
+    pub async fn update_session_token(
+        &self,
+        user_id: i32,
+        session_token: &str,
+    ) -> anyhow::Result<()> {
+        sqlx::query!(
+            r#"
+            UPDATE users
+            SET session_token = $1
+            WHERE id = $2
+            "#,
+            session_token,
+            user_id
+        )
+        .execute(&self.pool)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn remove_session_token(&self, user_id: i32) -> anyhow::Result<()> {
+        sqlx::query!(
+            r#"
+            UPDATE users
+            SET session_token = NULL
+            WHERE id = $1
+            "#,
+            user_id
+        )
+        .execute(&self.pool)
+        .await?;
+
+        Ok(())
+    }
 }
