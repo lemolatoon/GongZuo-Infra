@@ -31,3 +31,61 @@ fn main() {
     file.write_all(dotenv_contents.as_bytes()).unwrap();
 }
 '''
+
+[tasks.make_user]
+script_runner = "@rust"
+script = '''
+//! ```cargo
+//! [dependencies]
+//! hex = "0.4.3"
+//! ring = "0.17.0"
+//! anyhow = "1.0.40"
+//! ```
+use std::io::Write;
+use std::fs;
+use std::path;
+use std::io;
+
+use ring::pbkdf2::{self, verify, PBKDF2_HMAC_SHA256};
+use ring::rand::SecureRandom;
+use ring::rand::SystemRandom;
+
+/// Derive a password using PBKDF2
+/// Returns a tuple of (salt, hashed_password)
+pub fn derive(password: String) -> anyhow::Result<(String, String)> {
+    let mut salt = [0u8; 16];
+    SystemRandom::new()
+        .fill(&mut salt)
+        .map_err(|e| anyhow::anyhow!(e))?;
+    let mut hashed_password = [0u8; 32];
+    pbkdf2::derive(
+        PBKDF2_HMAC_SHA256,
+        std::num::NonZeroU32::new(100_000).unwrap(),
+        &salt,
+        password.as_bytes(),
+        &mut hashed_password,
+    );
+    let salt = hex::encode(salt);
+    let hashed_password = hex::encode(hashed_password);
+
+    Ok((salt, hashed_password))
+}
+
+fn main() {
+    let username = "admin";
+    println!("Please enter a password for the admin user:");
+
+    let mut password = String::new();
+    io::stdin().read_line(&mut password).unwrap();
+    let password = password.trim().to_string();
+
+    let (salt, hashed_password) = derive(password).unwrap();
+
+    let sql = format!("INSERT INTO users (username, password, salt) VALUES ('{}', '{}', '{}');", username, hashed_password, salt);
+
+    let init_admin_path = path::Path::new("scripts/1_init_admin.sql");
+    let mut file = fs::File::create(init_admin_path).unwrap();
+
+    file.write_all(sql.as_bytes()).unwrap();
+}
+'''

@@ -1,5 +1,15 @@
 # GongZuo Infra
 
+### 準備
+
+```bash
+cargo install cargo-make
+cp .env.example .env
+cargo make dotenv
+# admin userのpasswordを聞かれる
+cargo make make_user
+```
+
 ### 開発環境での DB の接続
 
 ```bash
