@@ -42,6 +42,7 @@ async fn main() {
         .route("/users", get(users))
         .route("/register", post(handlers::register::register))
         .route("/login", post(handlers::login::login))
+        .route("/logout", post(handlers::logout::logout))
         .layer(Extension(db));
 
     // run it with hyper

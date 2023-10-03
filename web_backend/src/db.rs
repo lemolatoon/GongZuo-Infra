@@ -92,4 +92,19 @@ impl DB {
 
         Ok(())
     }
+
+    pub async fn ensure_session_token(&self, session_token: &str) -> anyhow::Result<Option<User>> {
+        let user: Option<User> = sqlx::query_as!(
+            User,
+            r#"
+            SELECT * FROM users
+            WHERE session_token = $1
+            "#,
+            session_token
+        )
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(user)
+    }
 }
