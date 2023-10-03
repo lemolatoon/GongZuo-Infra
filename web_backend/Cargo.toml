@@ -6,7 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+axum = { version = "0.6.20" }
+chrono = { version = "0.4", features = ["serde"] }
 dotenvy = "0.15.7"
 once_cell = "1.18.0"
-sqlx = { version = "0.7.2", features = ["runtime-tokio", "postgres", "time"] }
+serde = { version = "1.0", features = ["derive"] }
+sqlx = { version = "0.7.2", features = [
+    "runtime-tokio",
+    "postgres",
+    "time",
+    "chrono",
+] }
 tokio = { version = "1.3", features = ["full"] }

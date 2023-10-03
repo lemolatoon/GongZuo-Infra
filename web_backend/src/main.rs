@@ -1,3 +1,10 @@
+pub mod db;
+
+use std::net::SocketAddr;
+
+use axum::{self, response::IntoResponse, routing::get, Extension, Json, Router};
+use chrono::NaiveDateTime;
+use db::{user::User, DB};
 use dotenvy;
 use once_cell::sync::Lazy;
 use sqlx::postgres::PgPoolOptions;
@@ -19,13 +26,31 @@ async fn main() {
         .await
         .unwrap();
 
-    let users = sqlx::query!("SELECT * FROM users")
-        .fetch_all(&pool)
+    let db = db::DB::new(pool);
+
+    let app = Router::new()
+        .route("/", get(|| async { "Hello, world! from '/'" }))
+        .route("/users", get(users))
+        .layer(Extension(db));
+
+    // run it with hyper
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
         .await
         .unwrap();
+}
 
-    println!("users: {:?}", &users);
-    if let Some(user) = users.first() {
-        println!("id: {}, username: {}", user.id, user.username);
-    }
+pub async fn users(Extension(db): Extension<DB>) -> impl IntoResponse {
+    let mut users = db.users().await;
+    // dummy user
+    users.push(User {
+        id: 1,
+        username: "username".to_string(),
+        password: "password".to_string(),
+        salt: "salt".to_string(),
+        created_at: NaiveDateTime::from_timestamp_opt(0, 0).unwrap(),
+    });
+    println!("users: {:?}", users);
+    Json(users)
 }
