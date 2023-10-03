@@ -1,11 +1,19 @@
 pub mod db;
+pub mod error;
+pub mod handlers;
+pub mod password;
 
 use std::net::SocketAddr;
 
-use axum::{self, response::IntoResponse, routing::get, Extension, Json, Router};
-use chrono::NaiveDateTime;
-use db::{user::User, DB};
+use axum::{
+    self,
+    response::IntoResponse,
+    routing::{get, post},
+    Extension, Json, Router,
+};
+use db::DB;
 use dotenvy;
+use error::Result;
 use once_cell::sync::Lazy;
 use sqlx::postgres::PgPoolOptions;
 
@@ -31,6 +39,8 @@ async fn main() {
     let app = Router::new()
         .route("/", get(|| async { "Hello, world! from '/'" }))
         .route("/users", get(users))
+        .route("/register", post(handlers::register::register))
+        .route("/login", post(handlers::login::login))
         .layer(Extension(db));
 
     // run it with hyper
@@ -41,16 +51,7 @@ async fn main() {
         .unwrap();
 }
 
-pub async fn users(Extension(db): Extension<DB>) -> impl IntoResponse {
-    let mut users = db.users().await;
-    // dummy user
-    users.push(User {
-        id: 1,
-        username: "username".to_string(),
-        password: "password".to_string(),
-        salt: "salt".to_string(),
-        created_at: NaiveDateTime::from_timestamp_opt(0, 0).unwrap(),
-    });
-    println!("users: {:?}", users);
-    Json(users)
+pub async fn users(Extension(db): Extension<DB>) -> Result<impl IntoResponse> {
+    let users = db.users().await?;
+    Ok(Json(users))
 }
