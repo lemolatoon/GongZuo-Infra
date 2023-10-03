@@ -4,6 +4,7 @@ pub mod handlers;
 pub mod password;
 pub mod router;
 pub mod session;
+pub mod util;
 
 use std::net::SocketAddr;
 

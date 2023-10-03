@@ -1,6 +1,8 @@
-use chrono::{DateTime, FixedOffset, NaiveDateTime, Utc};
+use chrono::{DateTime, FixedOffset, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 use sqlx::Postgres;
+
+use crate::util::timezone::into_jst;
 
 #[derive(sqlx::FromRow, Deserialize, Debug)]
 pub struct UserRaw {
@@ -30,9 +32,7 @@ impl From<UserRaw> for User {
             ..
         } = value;
 
-        let created_at: DateTime<Utc> = DateTime::from_naive_utc_and_offset(created_at, Utc);
-        const JST: Option<FixedOffset> = FixedOffset::east_opt(9 * 3600);
-        let created_at = created_at.with_timezone(&JST.unwrap());
+        let created_at = into_jst(created_at);
         User {
             id,
             username,

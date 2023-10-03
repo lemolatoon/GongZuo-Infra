@@ -1,8 +1,9 @@
+pub mod gongzuo;
 pub mod user;
 
 use sqlx::{Pool, Postgres};
 
-use self::user::UserHandlerTrait;
+use self::{gongzuo::GongzuoHandlerTrait, user::UserHandlerTrait};
 
 #[derive(Clone)]
 pub struct DB {
@@ -16,5 +17,9 @@ impl DB {
 
     pub fn user_handler(&self) -> impl UserHandlerTrait + '_ {
         user::UserHandler::new(&self.pool)
+    }
+
+    pub fn gongzuo_handler(&self) -> impl GongzuoHandlerTrait + '_ {
+        gongzuo::GongzuoHandler::new(&self.pool)
     }
 }
