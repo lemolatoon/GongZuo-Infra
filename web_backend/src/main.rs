@@ -2,22 +2,17 @@ pub mod db;
 pub mod error;
 pub mod handlers;
 pub mod password;
+pub mod router;
 pub mod session;
 
 use std::net::SocketAddr;
 
-use axum::{
-    self,
-    extract::State,
-    response::IntoResponse,
-    routing::{get, post},
-    Json, Router,
-};
-use db::user::{User, UserHandlerTrait};
-use db::DB;
-use error::Result;
+use axum::{self};
+use db::user::UserHandlerTrait;
 use once_cell::sync::Lazy;
 use sqlx::postgres::PgPoolOptions;
+
+use crate::router::root::app_router;
 
 static DATABASE_URL: Lazy<String> = Lazy::new(|| {
     dotenvy::dotenv().unwrap();
@@ -47,13 +42,7 @@ async fn main() {
         panic!("Admin user is not registered");
     }
 
-    let app = Router::new()
-        .route("/", get(|| async { "Hello, world! from '/'" }))
-        .route("/users", get(users))
-        .route("/register", post(handlers::register::register))
-        .route("/login", post(handlers::login::login))
-        .route("/logout", post(handlers::logout::logout))
-        .with_state(db);
+    let app = app_router(db);
 
     let port = std::env::var("PORT")
         .map_or(None, |p| p.parse().ok())
@@ -65,16 +54,4 @@ async fn main() {
         .serve(app.into_make_service())
         .await
         .unwrap();
-}
-
-pub async fn users(State(db): State<DB>) -> Result<impl IntoResponse> {
-    let users: Vec<_> = db
-        .user_handler()
-        .users()
-        .await?
-        .into_iter()
-        .filter(|user| !user.is_admin)
-        .map(User::from)
-        .collect();
-    Ok(Json(users))
 }
