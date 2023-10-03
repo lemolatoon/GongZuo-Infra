@@ -45,8 +45,11 @@ async fn main() {
         .route("/logout", post(handlers::logout::logout))
         .layer(Extension(db));
 
+
+    let port = std::env::var("PORT").map_or(None, |p| p.parse().ok()).unwrap_or(3000);
     // run it with hyper
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([127, 0, 0, 1], port));
+    println!("Listening on {}", &addr);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await

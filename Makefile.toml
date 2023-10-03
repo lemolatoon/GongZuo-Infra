@@ -1,3 +1,6 @@
+[tasks.watch]
+script = "(cargo watch --version || cargo install cargo-watch) && cd web_backend && cargo watch -x run"
+
 [tasks.dotenv]
 script_runner = "@rust"
 script = '''
