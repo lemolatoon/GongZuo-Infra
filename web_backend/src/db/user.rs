@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, FixedOffset, NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::Postgres;
 
@@ -18,7 +18,7 @@ pub struct UserRaw {
 pub struct User {
     pub id: i32,
     pub username: String,
-    pub created_at: DateTime<Utc>,
+    pub created_at: DateTime<FixedOffset>,
 }
 
 impl From<UserRaw> for User {
@@ -31,6 +31,8 @@ impl From<UserRaw> for User {
         } = value;
 
         let created_at: DateTime<Utc> = DateTime::from_naive_utc_and_offset(created_at, Utc);
+        const JST: Option<FixedOffset> = FixedOffset::east_opt(9 * 3600);
+        let created_at = created_at.with_timezone(&JST.unwrap());
         User {
             id,
             username,
