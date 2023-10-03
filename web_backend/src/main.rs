@@ -13,7 +13,6 @@ use axum::{
     Extension, Json, Router,
 };
 use db::DB;
-use dotenvy;
 use error::Result;
 use once_cell::sync::Lazy;
 use sqlx::postgres::PgPoolOptions;
@@ -45,8 +44,9 @@ async fn main() {
         .route("/logout", post(handlers::logout::logout))
         .layer(Extension(db));
 
-
-    let port = std::env::var("PORT").map_or(None, |p| p.parse().ok()).unwrap_or(3000);
+    let port = std::env::var("PORT")
+        .map_or(None, |p| p.parse().ok())
+        .unwrap_or(3000);
     // run it with hyper
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
     println!("Listening on {}", &addr);

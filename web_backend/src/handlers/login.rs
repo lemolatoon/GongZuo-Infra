@@ -46,19 +46,19 @@ pub async fn login(
             }
         };
 
-        return Ok((
+        Ok((
             StatusCode::OK,
             Json(json!({
                 "message": "Login successful",
                 "session_token": session_token,
             })),
-        ));
+        ))
     } else {
-        return Ok((
+        Ok((
             StatusCode::UNAUTHORIZED,
             Json(json!({
                 "message": "Login failed"
             })),
-        ));
+        ))
     }
 }
