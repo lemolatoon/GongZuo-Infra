@@ -4,7 +4,7 @@ use axum::{response::IntoResponse, Json};
 use serde::Deserialize;
 use serde_json::json;
 
-use crate::db::user::{User, UserHandlerTrait};
+use crate::db::user::{UserHandlerTrait, UserRaw};
 use crate::db::DB;
 use crate::error::Result;
 use crate::password;
@@ -26,7 +26,7 @@ pub async fn login(
         return Err(anyhow::anyhow!("User {} not found", &username).into());
     };
 
-    let User {
+    let UserRaw {
         id: user_id,
         password: hashed_password,
         salt,

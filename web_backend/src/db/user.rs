@@ -1,9 +1,9 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::Postgres;
 
-#[derive(sqlx::FromRow, Serialize, Deserialize, Debug)]
-pub struct User {
+#[derive(sqlx::FromRow, Deserialize, Debug)]
+pub struct UserRaw {
     pub id: i32,
     pub username: String,
     pub password: String,
@@ -12,6 +12,31 @@ pub struct User {
     #[sqlx(default)]
     pub session_token: Option<String>,
     pub is_admin: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct User {
+    pub id: i32,
+    pub username: String,
+    pub created_at: DateTime<Utc>,
+}
+
+impl From<UserRaw> for User {
+    fn from(value: UserRaw) -> Self {
+        let UserRaw {
+            id,
+            username,
+            created_at,
+            ..
+        } = value;
+
+        let created_at: DateTime<Utc> = DateTime::from_naive_utc_and_offset(created_at, Utc);
+        User {
+            id,
+            username,
+            created_at,
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -27,8 +52,8 @@ impl<'a> UserHandler<'a> {
 
 #[axum::async_trait]
 pub trait UserHandlerTrait {
-    async fn get_user_by_username(&self, username: &str) -> anyhow::Result<Option<User>>;
-    async fn users(&self) -> anyhow::Result<Vec<User>>;
+    async fn get_user_by_username(&self, username: &str) -> anyhow::Result<Option<UserRaw>>;
+    async fn users(&self) -> anyhow::Result<Vec<UserRaw>>;
     async fn register_user(
         &self,
         username: &str,
@@ -36,16 +61,16 @@ pub trait UserHandlerTrait {
         salt: &str,
     ) -> anyhow::Result<()>;
     async fn update_session_token(&self, user_id: i32, session_token: &str) -> anyhow::Result<()>;
-    async fn ensure_session_token(&self, session_token: &str) -> anyhow::Result<Option<User>>;
+    async fn ensure_session_token(&self, session_token: &str) -> anyhow::Result<Option<UserRaw>>;
     async fn remove_session_token(&self, user_id: i32) -> anyhow::Result<()>;
     async fn ensure_admin_user_is_registered(&self, username: &str) -> anyhow::Result<bool>;
 }
 
 #[axum::async_trait]
 impl UserHandlerTrait for UserHandler<'_> {
-    async fn get_user_by_username(&self, username: &str) -> anyhow::Result<Option<User>> {
+    async fn get_user_by_username(&self, username: &str) -> anyhow::Result<Option<UserRaw>> {
         let user = sqlx::query_as!(
-            User,
+            UserRaw,
             r#"
             SELECT * FROM users
             WHERE username = $1
@@ -58,8 +83,8 @@ impl UserHandlerTrait for UserHandler<'_> {
         Ok(user)
     }
 
-    async fn users(&self) -> anyhow::Result<Vec<User>> {
-        let users = sqlx::query_as!(User, "SELECT * FROM users")
+    async fn users(&self) -> anyhow::Result<Vec<UserRaw>> {
+        let users = sqlx::query_as!(UserRaw, "SELECT * FROM users")
             .fetch_all(self.pool)
             .await?;
 
@@ -118,9 +143,9 @@ impl UserHandlerTrait for UserHandler<'_> {
         Ok(())
     }
 
-    async fn ensure_session_token(&self, session_token: &str) -> anyhow::Result<Option<User>> {
-        let user: Option<User> = sqlx::query_as!(
-            User,
+    async fn ensure_session_token(&self, session_token: &str) -> anyhow::Result<Option<UserRaw>> {
+        let user = sqlx::query_as!(
+            UserRaw,
             r#"
             SELECT * FROM users
             WHERE session_token = $1
@@ -134,8 +159,8 @@ impl UserHandlerTrait for UserHandler<'_> {
     }
 
     async fn ensure_admin_user_is_registered(&self, username: &str) -> anyhow::Result<bool> {
-        let user: Option<User> = sqlx::query_as!(
-            User,
+        let user = sqlx::query_as!(
+            UserRaw,
             r#"
             SELECT * FROM users
             WHERE username = $1 AND is_admin = true

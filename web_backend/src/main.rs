@@ -13,7 +13,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use db::user::UserHandlerTrait;
+use db::user::{User, UserHandlerTrait};
 use db::DB;
 use error::Result;
 use once_cell::sync::Lazy;
@@ -68,6 +68,13 @@ async fn main() {
 }
 
 pub async fn users(State(db): State<DB>) -> Result<impl IntoResponse> {
-    let users = db.user_handler().users().await?;
+    let users: Vec<_> = db
+        .user_handler()
+        .users()
+        .await?
+        .into_iter()
+        .filter(|user| !user.is_admin)
+        .map(User::from)
+        .collect();
     Ok(Json(users))
 }
