@@ -190,8 +190,7 @@ paths:
       summary: Get all gongzuos
       description: Get all gongzuos
       parameters:
-        - session_token:
-          $ref: '#/components/parameters/session_token'
+          - $ref: '#/components/parameters/session_token'
       responses:
         '200':
           description: OK
@@ -220,8 +219,7 @@ paths:
       summary: Start a new gongzuo
       description: Start a new gongzuo
       parameters:
-        - session_token:
-          $ref: '#/components/parameters/session_token'
+          - $ref: '#/components/parameters/session_token'
       requestBody:
         description: content_kind and content
         content:
@@ -268,8 +266,7 @@ paths:
       summary: End a gongzuo
       description: End a gongzuo
       parameters:
-        - session_token:
-          $ref: '#/components/parameters/session_token'
+          - $ref: '#/components/parameters/session_token'
       requestBody:
         description: gongzuo_id
         content:
@@ -317,8 +314,7 @@ paths:
       summary: Delete a gongzuo
       description: Delete a gongzuo
       parameters:
-        - session_token:
-          $ref: '#/components/parameters/session_token'
+          - $ref: '#/components/parameters/session_token'
       requestBody:
         description: gongzuo_id
         content:
@@ -362,8 +358,7 @@ paths:
       summary: Edit a gongzuo
       description: Edit a gongzuo
       parameters:
-        - session_token:
-          $ref: '#/components/parameters/session_token'
+          - $ref: '#/components/parameters/session_token'
       requestBody:
         description: gongzuo_id, started_at, ended_at, content_kind and content
         content:
@@ -426,8 +421,7 @@ paths:
           schema:
             type: integer
             format: int32
-        - name: session_token
-          $ref: '#/components/parameters/session_token'
+        - $ref: '#/components/parameters/session_token'
       responses:
         '200':
           description: OK
