@@ -61,7 +61,7 @@ pub trait UserHandlerTrait {
         username: &str,
         hashed_password: &str,
         salt: &str,
-    ) -> anyhow::Result<()>;
+    ) -> anyhow::Result<UserRaw>;
     async fn update_session_token(&self, user_id: i32, session_token: &str) -> anyhow::Result<()>;
     async fn ensure_session_token(&self, session_token: &str) -> anyhow::Result<Option<UserRaw>>;
     async fn remove_session_token(&self, user_id: i32) -> anyhow::Result<()>;
@@ -98,20 +98,23 @@ impl UserHandlerTrait for UserHandler<'_> {
         username: &str,
         hashed_password: &str,
         salt: &str,
-    ) -> anyhow::Result<()> {
-        sqlx::query!(
+    ) -> anyhow::Result<UserRaw> {
+        let user = sqlx::query_as!(
+            UserRaw,
             r#"
             INSERT INTO users (username, password, salt)
             VALUES ($1, $2, $3)
+            RETURNING
+            *
             "#,
             username,
             hashed_password,
             salt
         )
-        .execute(self.pool)
+        .fetch_one(self.pool)
         .await?;
 
-        Ok(())
+        Ok(user)
     }
 
     async fn update_session_token(&self, user_id: i32, session_token: &str) -> anyhow::Result<()> {

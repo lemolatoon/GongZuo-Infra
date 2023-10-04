@@ -98,7 +98,10 @@ pub async fn start_gongzuo(
         .create_gongzuo(user.id, payload)
         .await?;
 
-    Ok((StatusCode::OK, Json(json!({ "gongzuo_id": gongzuo_id }))))
+    Ok((
+        StatusCode::CREATED,
+        Json(json!({ "gongzuo_id": gongzuo_id })),
+    ))
 }
 
 #[derive(Deserialize, Debug, Clone)]

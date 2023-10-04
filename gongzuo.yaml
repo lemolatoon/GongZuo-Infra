@@ -1,0 +1,511 @@
+openapi: 3.0.0
+
+info:
+  title: Gongzuo API
+  version: '1.0'
+
+servers:
+  - url: http://localhost:3001
+    description: Local Development server
+
+paths:
+  /users:
+    get:
+      tags:
+        - users
+      summary: Get all users
+      description: Get all users
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+          
+  /register:
+    post:
+      tags:
+        - users
+      summary: Register a new user
+      description: Register a new user
+      parameters: []
+      requestBody:
+        description: username and password
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - user
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+  /login:
+    post:
+      tags:
+        - users
+      summary: User Login
+      description: User Login
+      parameters: []
+      requestBody:
+        description: username and password
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - session_token
+                properties:
+                  session_token:
+                    type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+  /logout:
+    post:
+      tags:
+        - users
+      summary: User Logout
+      description: User Logout
+      parameters: []
+      requestBody:
+        description: session_token
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - session_token
+              properties:
+                session_token:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+  
+  /gongzuo/gongzuos:
+    get:
+      tags:
+        - gongzuos
+      summary: Get all gongzuos
+      description: Get all gongzuos
+      parameters:
+        - session_token:
+          $ref: '#/components/parameters/session_token'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Gongzuo'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+  /gongzuo/start:
+    post:
+      tags:
+        - gongzuos
+      summary: Start a new gongzuo
+      description: Start a new gongzuo
+      parameters:
+        - session_token:
+          $ref: '#/components/parameters/session_token'
+      requestBody:
+        description: content_kind and content
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content_kind
+                - content
+              properties:
+                content_kind:
+                  $ref: '#/components/schemas/ContentKind'
+                content:
+                  type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - gongzuo_id
+                properties:
+                  gongzuo_id:
+                    type: integer
+                    format: int32
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage' 
+  /gongzuo/end:
+    post:
+      tags:
+        - gongzuos
+      summary: End a gongzuo
+      description: End a gongzuo
+      parameters:
+        - session_token:
+          $ref: '#/components/parameters/session_token'
+      requestBody:
+        description: gongzuo_id
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - gongzuo_id
+              properties:
+                gongzuo_id:
+                  type: integer
+                  format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ended_at
+                  - message
+                properties:
+                  ended_at:
+                    type: string
+                    format: date-time
+                  message:
+                    type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+  /gongzuo/delete:
+    delete:
+      tags:
+        - gongzuos
+      summary: Delete a gongzuo
+      description: Delete a gongzuo
+      parameters:
+        - session_token:
+          $ref: '#/components/parameters/session_token'
+      requestBody:
+        description: gongzuo_id
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - gongzuo_id
+              properties:
+                gongzuo_id:
+                  type: integer
+                  format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+  /gongzuo/edit:
+    put:
+      tags:
+        - gongzuos
+      summary: Edit a gongzuo
+      description: Edit a gongzuo
+      parameters:
+        - session_token:
+          $ref: '#/components/parameters/session_token'
+      requestBody:
+        description: gongzuo_id, started_at, ended_at, content_kind and content
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - gongzuo_id
+                - started_at
+                - content_kind
+                - content
+              properties:
+                gongzuo_id:
+                  type: integer
+                  format: int32
+                started_at:
+                  type: string
+                  format: date-time
+                ended_at:
+                  type: string
+                  format: date-time
+                content_kind:
+                  $ref: '#/components/schemas/ContentKind'
+                content:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+  /gongzuo/{id}:
+    get:
+      tags:
+        - gongzuos
+      summary: Get a gongzuo
+      description: Get a gongzuo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: session_token
+          $ref: '#/components/parameters/session_token'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Gongzuo'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+    
+      
+      
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - created_at
+      properties:
+        id:
+          type: integer
+          format: int32
+        username:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    ContentKind:
+      type: integer
+      format: int32
+      enum:
+        - 0
+        - 1
+    Gongzuo:
+      type: object
+      required:
+        - id
+        - started_at
+        - content_kind
+        - content
+      properties:
+        id:
+          type: integer
+          format: int32
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+        content_kind:
+          $ref: '#/components/schemas/ContentKind'
+        content:
+          type: string
+    ErrorMessage:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+  parameters:
+    session_token:
+      name: session_token
+      in: query
+      required: true
+      schema:
+        type: string

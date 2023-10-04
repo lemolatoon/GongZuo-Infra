@@ -3,7 +3,10 @@ use serde::Deserialize;
 use serde_json::json;
 
 use crate::{
-    db::{user::UserHandlerTrait, DB},
+    db::{
+        user::{User, UserHandlerTrait},
+        DB,
+    },
     error::AppError,
 };
 
@@ -32,14 +35,15 @@ pub async fn register(
 
     let (salt, hashed_password) = crate::password::derive(password)?;
 
-    db.user_handler()
+    let user = db
+        .user_handler()
         .register_user(&username, &hashed_password, &salt)
         .await?;
 
     Ok((
         StatusCode::CREATED,
         Json(json!({
-            "message": "User created"
+            "user": User::from(user)
         })),
     ))
 }
