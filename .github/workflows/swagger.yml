@@ -21,7 +21,6 @@ jobs:
           swagger-cli validate -d gongzuo.yaml --type yaml
 
       - name: Generate Swagger UI
-        if: github.event.pull_request.merged == true
         uses: Legion2/swagger-ui-action@v1
         with:
           output: swagger-ui
