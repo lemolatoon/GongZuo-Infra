@@ -18,21 +18,23 @@ jobs:
 
       - name: Validate Swagger Files
         run: |
-          swagger-cli validate -d openapi.yaml --type yaml
+          swagger-cli validate -d gongzuo.yaml --type yaml
 
       - name: Generate Swagger UI
         if: github.event.pull_request.merged == true
         uses: Legion2/swagger-ui-action@v1
         with:
           output: swagger-ui
-          spec-file: openapi.yaml
+          spec-file: gongzuo.yaml
 
-      - name: Deploy to GitHub Pages
-        if: github.event.pull_request.merged == true
-        uses: peaceiris/actions-gh-pages@v3
+      - uses: actions/upload-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: swagger-ui
+          name: openapi
+          path: swagger-ui
+      - uses: actions/upload-pages-artifact@v1
+        with:
+          path: swagger-ui
+
   deploy:
     environment:
       name: github-pages
