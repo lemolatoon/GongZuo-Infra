@@ -9,6 +9,33 @@ servers:
     description: Local Development server
 
 paths:
+  /me:
+    get:
+      tags:
+        - users
+      summary: Get current user by session_token
+      description: Get current user by session_token
+      parameters:
+        - $ref: "#/components/parameters/session_token"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
   /users:
     get:
       tags:

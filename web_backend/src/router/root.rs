@@ -12,6 +12,7 @@ pub fn app_router(db: db::DB) -> Router {
         .route("/register", post(handlers::register::register))
         .route("/login", post(handlers::login::login))
         .route("/logout", post(handlers::logout::logout))
+        .route("/me", get(handlers::users::me))
         .nest("/gongzuo", router::gongzuo::gongzuo_router())
         .with_state(db)
 }

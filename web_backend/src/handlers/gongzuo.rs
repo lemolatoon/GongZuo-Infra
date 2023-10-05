@@ -29,7 +29,7 @@ impl Default for SessionQuery {
     }
 }
 
-fn session_token_invalid_error() -> Result<(StatusCode, axum::Json<serde_json::Value>)> {
+pub fn session_token_invalid_error() -> Result<(StatusCode, axum::Json<serde_json::Value>)> {
     Ok((
         StatusCode::UNAUTHORIZED,
         Json(json!({
@@ -38,6 +38,7 @@ fn session_token_invalid_error() -> Result<(StatusCode, axum::Json<serde_json::V
     ))
 }
 
+#[macro_export]
 macro_rules! get_user_by_session_token {
     ($db:expr, $session_token:expr) => {{
         let Some(session_token) = $session_token else {
