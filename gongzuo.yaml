@@ -150,7 +150,6 @@ paths:
                 - session_token
               properties:
                 session_token:
-                  required: true
                   type: string
       responses:
         "200":
