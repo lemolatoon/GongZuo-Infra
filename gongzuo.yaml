@@ -13,7 +13,7 @@ paths:
     get:
       tags:
         - users
-      operationalId: me
+      operationId: me
       summary: Get current user by session_token
       description: Get current user by session_token
       parameters:
@@ -41,7 +41,7 @@ paths:
     get:
       tags:
         - users
-      operationalId: getAllUsers
+      operationId: getAllUsers
       summary: Get all users
       description: Get all users
       responses:
@@ -70,7 +70,7 @@ paths:
     post:
       tags:
         - users
-      operatinalId: register
+      operationId: register
       summary: Register a new user
       description: Register a new user
       requestBody:
@@ -116,7 +116,7 @@ paths:
     post:
       tags:
         - users
-      operationalId: login
+      operationId: login
       summary: User Login
       description: User Login
       requestBody:
@@ -168,7 +168,7 @@ paths:
     post:
       tags:
         - users
-      operationalId: logout
+      operationId: logout
       summary: User Logout
       description: User Logout
       requestBody:
@@ -218,7 +218,7 @@ paths:
     get:
       tags:
         - gongzuos
-      operationalId: getAllGongzuos
+      operationId: getAllGongzuos
       summary: Get all gongzuos
       description: Get all gongzuos
       parameters:
@@ -248,7 +248,7 @@ paths:
     post:
       tags:
         - gongzuos
-      operationalId: start
+      operationId: start
       summary: Start a new gongzuo
       description: Start a new gongzuo
       parameters:
@@ -297,7 +297,7 @@ paths:
     post:
       tags:
         - gongzuos
-      operationalId: end
+      operationId: end
       summary: End a gongzuo
       description: End a gongzuo
       parameters:
@@ -347,7 +347,7 @@ paths:
     delete:
       tags:
         - gongzuos
-      operational: delete
+      operationId: delete
       summary: Delete a gongzuo
       description: Delete a gongzuo
       parameters:
@@ -393,7 +393,7 @@ paths:
     put:
       tags:
         - gongzuos
-      operationalId: edit
+      operationId: edit
       summary: Edit a gongzuo
       description: Edit a gongzuo
       parameters:
@@ -452,7 +452,7 @@ paths:
     get:
       tags:
         - gongzuos
-      operationalId: getGongzuoById
+      operationId: getGongzuoById
       summary: Get a gongzuo
       description: Get a gongzuo
       parameters:
