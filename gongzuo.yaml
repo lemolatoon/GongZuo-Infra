@@ -299,12 +299,12 @@ paths:
         - gongzuos
       operationId: end
       summary: End a gongzuo
-      description: End a gongzuo
+      description: End a gongzuo, update content if you provide it
       parameters:
         - $ref: "#/components/parameters/session_token"
       requestBody:
         required: true
-        description: gongzuo_id
+        description: gongzuo_id and content
         content:
           application/json:
             schema:
@@ -315,6 +315,8 @@ paths:
                 gongzuo_id:
                   type: integer
                   format: int32
+                content:
+                  type: string
       responses:
         "200":
           description: OK

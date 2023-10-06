@@ -7,7 +7,9 @@ use sqlx::Postgres;
 
 use crate::util::timezone::into_jst;
 
-#[derive(Debug, Serialize_repr, Deserialize_repr, sqlx::Type, Clone, Copy)]
+#[derive(
+    Debug, Serialize_repr, Deserialize_repr, sqlx::Type, Clone, Copy, PartialEq, Eq, PartialOrd, Ord,
+)]
 #[repr(i32)]
 pub enum ContentKind {
     Work = 0,

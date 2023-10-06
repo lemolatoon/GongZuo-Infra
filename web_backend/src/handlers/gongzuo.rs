@@ -108,6 +108,7 @@ pub async fn start_gongzuo(
 #[derive(Deserialize, Debug, Clone)]
 pub struct GongzuoEndPayload {
     pub gongzuo_id: i32,
+    pub content: Option<String>,
 }
 
 pub async fn end_gongzuo(
@@ -117,7 +118,10 @@ pub async fn end_gongzuo(
 ) -> Result<impl IntoResponse> {
     let user = get_user_by_session_token!(db, session_token);
 
-    let GongzuoEndPayload { gongzuo_id } = payload;
+    let GongzuoEndPayload {
+        gongzuo_id,
+        content,
+    } = payload;
 
     let Some(gongzuo) = db
         .gongzuo_handler()
@@ -141,13 +145,24 @@ pub async fn end_gongzuo(
         ));
     }
 
+    if gongzuo.content_kind == ContentKind::NotWork && content.is_some() {
+        return Ok((
+            StatusCode::BAD_REQUEST,
+            Json(json!({
+                "message": format!("Gongzuo {} is not work, so content must be None", gongzuo_id)
+            })),
+        ));
+    }
+
     let Gongzuo {
         id: gongzuo_id,
         started_at,
         content_kind,
-        content,
+        content: original_content,
         ..
     } = Gongzuo::from(gongzuo);
+
+    let content = content.unwrap_or(original_content);
 
     let started_at = started_at.with_timezone(&Utc);
     let ended_at = Some(Utc::now());
