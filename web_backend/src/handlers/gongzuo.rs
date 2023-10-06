@@ -56,13 +56,13 @@ macro_rules! get_user_by_session_token {
     }};
 }
 
-pub async fn gongzuos(
+pub async fn all_ongzuos(
     State(db): State<DB>,
     Query(SessionQuery { session_token }): Query<SessionQuery>,
 ) -> Result<impl IntoResponse> {
-    let user = get_user_by_session_token!(db, session_token);
+    let _user = get_user_by_session_token!(db, session_token);
 
-    let gongzuos = db.gongzuo_handler().gongzuos_by_user_id(user.id).await?;
+    let gongzuos = db.gongzuo_handler().all_gongzuos().await?;
     let gongzuos = gongzuos.into_iter().map(Gongzuo::from).collect::<Vec<_>>();
     Ok((StatusCode::OK, Json(json!(gongzuos))))
 }

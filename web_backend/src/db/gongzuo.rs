@@ -91,6 +91,7 @@ pub struct GongzuoPayload {
 
 #[axum::async_trait]
 pub trait GongzuoHandlerTrait {
+    async fn all_gongzuos(&self) -> anyhow::Result<Vec<GongzuoRaw>>;
     async fn gongzuos_by_user_id(&self, user_id: i32) -> anyhow::Result<Vec<GongzuoRaw>>;
     async fn create_gongzuo(&self, user_id: i32, payload: GongzuoPayload) -> anyhow::Result<i32>;
     async fn update_gongzuo(
@@ -111,6 +112,37 @@ impl<'a> GongzuoHandler<'a> {
 
 #[axum::async_trait]
 impl GongzuoHandlerTrait for GongzuoHandler<'_> {
+    async fn all_gongzuos(&self) -> anyhow::Result<Vec<GongzuoRaw>> {
+        let gongzuos = sqlx::query_as!(
+            GongzuoRaw,
+            r#"
+            SELECT
+                gongzuo.id AS id,
+                contents.id AS content_id,
+                started_at,
+                ended_at,
+                content_kind,
+                content
+            FROM
+                gongzuo
+            JOIN
+                contents
+            ON
+                gongzuo.content_id = contents.id
+            JOIN
+                users
+            ON
+                gongzuo.user_id = users.id
+            WHERE
+                users.is_admin = false
+            "#
+        )
+        .fetch_all(self.pool)
+        .await?;
+
+        Ok(gongzuos)
+    }
+
     async fn gongzuos_by_user_id(&self, user_id: i32) -> anyhow::Result<Vec<GongzuoRaw>> {
         let gongzuos = sqlx::query_as!(
             GongzuoRaw,
