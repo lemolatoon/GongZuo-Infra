@@ -13,6 +13,7 @@ paths:
     get:
       tags:
         - users
+      operationalId: me
       summary: Get current user by session_token
       description: Get current user by session_token
       parameters:
@@ -40,6 +41,7 @@ paths:
     get:
       tags:
         - users
+      operationalId: getAllUsers
       summary: Get all users
       description: Get all users
       responses:
@@ -68,6 +70,7 @@ paths:
     post:
       tags:
         - users
+      operatinalId: register
       summary: Register a new user
       description: Register a new user
       requestBody:
@@ -113,6 +116,7 @@ paths:
     post:
       tags:
         - users
+      operationalId: login
       summary: User Login
       description: User Login
       requestBody:
@@ -164,6 +168,7 @@ paths:
     post:
       tags:
         - users
+      operationalId: logout
       summary: User Logout
       description: User Logout
       requestBody:
@@ -213,6 +218,7 @@ paths:
     get:
       tags:
         - gongzuos
+      operationalId: getAllGongzuos
       summary: Get all gongzuos
       description: Get all gongzuos
       parameters:
@@ -242,6 +248,7 @@ paths:
     post:
       tags:
         - gongzuos
+      operationalId: start
       summary: Start a new gongzuo
       description: Start a new gongzuo
       parameters:
@@ -290,6 +297,7 @@ paths:
     post:
       tags:
         - gongzuos
+      operationalId: end
       summary: End a gongzuo
       description: End a gongzuo
       parameters:
@@ -339,6 +347,7 @@ paths:
     delete:
       tags:
         - gongzuos
+      operational: delete
       summary: Delete a gongzuo
       description: Delete a gongzuo
       parameters:
@@ -384,6 +393,7 @@ paths:
     put:
       tags:
         - gongzuos
+      operationalId: edit
       summary: Edit a gongzuo
       description: Edit a gongzuo
       parameters:
@@ -442,6 +452,7 @@ paths:
     get:
       tags:
         - gongzuos
+      operationalId: getGongzuoById
       summary: Get a gongzuo
       description: Get a gongzuo
       parameters:
