@@ -104,6 +104,11 @@ pub trait GongzuoHandlerTrait {
     ) -> anyhow::Result<Result<(), String>>;
     async fn delete_gongzuo(&self, id: i32, user_id: i32) -> anyhow::Result<Result<(), String>>;
     async fn gongzuo_by_gongzuo_id(&self, gongzuo_id: i32) -> anyhow::Result<Option<GongzuoRaw>>;
+    async fn gongzuo_at(
+        &self,
+        user_id: i32,
+        at: DateTime<Utc>,
+    ) -> anyhow::Result<Option<GongzuoRaw>>;
 }
 
 impl<'a> GongzuoHandler<'a> {
@@ -394,5 +399,36 @@ impl GongzuoHandlerTrait for GongzuoHandler<'_> {
         transaction.commit().await?;
 
         Ok(Ok(()))
+    }
+
+    async fn gongzuo_at(
+        &self,
+        user_id: i32,
+        at: DateTime<Utc>,
+    ) -> anyhow::Result<Option<GongzuoRaw>> {
+        let row = sqlx::query_as!(
+            GongzuoRaw,
+            r#"
+            SELECT
+                gongzuo.id AS id,
+                contents.id AS content_id,
+                started_at,
+                ended_at,
+                content_kind,
+                content
+            FROM gongzuo
+            JOIN
+                contents
+            ON
+                gongzuo.content_id = contents.id
+            WHERE user_id = $1 AND started_at <= $2 AND (ended_at IS NULL OR ended_at > $2)
+            "#,
+            user_id,
+            at.naive_utc(),
+        )
+        .fetch_optional(self.pool)
+        .await?;
+
+        Ok(row)
     }
 }

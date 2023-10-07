@@ -42,8 +42,8 @@ pub fn session_token_invalid_error() -> Result<(StatusCode, axum::Json<serde_jso
 macro_rules! get_user_by_session_token {
     ($db:expr, $session_token:expr) => {{
         let Some(session_token) = $session_token else {
-            return session_token_invalid_error();
-        };
+                                            return session_token_invalid_error();
+                                        };
 
         match $db
             .user_handler()
@@ -86,6 +86,21 @@ pub async fn start_gongzuo(
     } = payload;
 
     let started_at = Utc::now();
+
+    let ongoing_gongzuo = db.gongzuo_handler().gongzuo_at(user.id, started_at).await?;
+
+    if ongoing_gongzuo.is_some() {
+        return Ok((
+            StatusCode::BAD_REQUEST,
+            Json(json!({
+                "message":
+                    format!(
+                        "Gongzuo {} is ongoing, so you can't end this gongzuo",
+                        ongoing_gongzuo.unwrap().id
+                    )
+            })),
+        ));
+    }
 
     let payload = GongzuoPayload {
         started_at,
@@ -149,7 +164,11 @@ pub async fn end_gongzuo(
         return Ok((
             StatusCode::BAD_REQUEST,
             Json(json!({
-                "message": format!("Gongzuo {} is not work, so content must be None", gongzuo_id)
+                "message":
+                    format!(
+                        "Gongzuo {} is not work, so content must be None",
+                        gongzuo_id
+                    )
             })),
         ));
     }
@@ -165,11 +184,11 @@ pub async fn end_gongzuo(
     let content = content.unwrap_or(original_content);
 
     let started_at = started_at.with_timezone(&Utc);
-    let ended_at = Some(Utc::now());
+    let ended_at = Utc::now();
 
     let payload = GongzuoPayload {
         started_at,
-        ended_at,
+        ended_at: Some(ended_at),
         content_kind,
         content,
     };
