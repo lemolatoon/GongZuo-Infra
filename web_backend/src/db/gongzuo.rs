@@ -38,6 +38,7 @@ impl From<ContentKind> for i32 {
 #[derive(sqlx::FromRow, Deserialize, Debug)]
 pub struct GongzuoRaw {
     pub id: i32,
+    pub user_id: i32,
     pub content_id: i32,
     pub started_at: NaiveDateTime,
     pub ended_at: Option<NaiveDateTime>,
@@ -48,6 +49,7 @@ pub struct GongzuoRaw {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Gongzuo {
     pub id: i32,
+    pub user_id: i32,
     pub content_id: i32,
     pub started_at: DateTime<FixedOffset>,
     pub ended_at: Option<DateTime<FixedOffset>>,
@@ -59,6 +61,7 @@ impl From<GongzuoRaw> for Gongzuo {
     fn from(value: GongzuoRaw) -> Self {
         let GongzuoRaw {
             id,
+            user_id,
             content_id,
             started_at,
             ended_at,
@@ -71,6 +74,7 @@ impl From<GongzuoRaw> for Gongzuo {
 
         Gongzuo {
             id,
+            user_id,
             content_id,
             started_at,
             ended_at,
@@ -126,6 +130,7 @@ impl GongzuoHandlerTrait for GongzuoHandler<'_> {
             SELECT
                 gongzuo.id AS id,
                 contents.id AS content_id,
+                user_id,
                 started_at,
                 ended_at,
                 content_kind,
@@ -157,6 +162,7 @@ impl GongzuoHandlerTrait for GongzuoHandler<'_> {
             SELECT
                 gongzuo.id AS id,
                 contents.id AS content_id,
+                user_id,
                 started_at,
                 ended_at,
                 content_kind,
@@ -185,6 +191,7 @@ impl GongzuoHandlerTrait for GongzuoHandler<'_> {
             SELECT
                 gongzuo.id AS id,
                 contents.id AS content_id,
+                user_id,
                 started_at,
                 ended_at,
                 content_kind,
@@ -412,6 +419,7 @@ impl GongzuoHandlerTrait for GongzuoHandler<'_> {
             SELECT
                 gongzuo.id AS id,
                 contents.id AS content_id,
+                user_id,
                 started_at,
                 ended_at,
                 content_kind,
