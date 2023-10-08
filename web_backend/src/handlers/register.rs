@@ -1,14 +1,23 @@
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use axum::{
+    extract::{Query, State},
+    http::StatusCode,
+    response::IntoResponse,
+    Json,
+};
 use serde::Deserialize;
 use serde_json::json;
 
+use crate::handlers::gongzuo::session_token_invalid_error;
 use crate::{
     db::{
         user::{User, UserHandlerTrait},
         DB,
     },
     error::AppError,
+    get_user_by_session_token,
 };
+
+use super::gongzuo::SessionQuery;
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct UserPayload {
@@ -18,8 +27,18 @@ pub struct UserPayload {
 
 pub async fn register(
     State(db): State<DB>,
+    Query(SessionQuery { session_token }): Query<SessionQuery>,
     Json(payload): Json<UserPayload>,
 ) -> Result<impl IntoResponse, AppError> {
+    let user = get_user_by_session_token!(db, session_token);
+    if !user.is_admin {
+        return Ok((
+            StatusCode::UNAUTHORIZED,
+            Json(json!({
+                "message": "Only admin can register new users"
+            })),
+        ));
+    }
     let UserPayload { username, password } = payload;
 
     let user = db.user_handler().get_user_by_username(&username).await?;
@@ -42,8 +61,6 @@ pub async fn register(
 
     Ok((
         StatusCode::CREATED,
-        Json(json!({
-            "user": User::from(user)
-        })),
+        Json(json!({ "user": User::from(user) })),
     ))
 }

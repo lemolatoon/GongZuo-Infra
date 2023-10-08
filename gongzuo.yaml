@@ -73,6 +73,8 @@ paths:
       operationId: register
       summary: Register a new user
       description: Register a new user
+      parameters:
+        - $ref: "#/components/parameters/session_token"
       requestBody:
         required: true
         description: username and password
