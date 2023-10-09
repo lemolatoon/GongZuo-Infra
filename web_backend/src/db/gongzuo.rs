@@ -296,6 +296,34 @@ impl GongzuoHandlerTrait for GongzuoHandler<'_> {
             content,
         } = payload;
 
+        let gongzuo_between = sqlx::query!(
+            r#"
+            SELECT
+                id
+            FROM
+                gongzuo
+            WHERE
+                id != $1
+            AND
+                user_id = $2
+            AND
+                started_at <= $3
+            AND
+                (ended_at IS NULL OR ended_at > $3)
+            "#,
+            gongzuo_id,
+            user_id,
+            started_at.naive_utc()
+        )
+        .fetch_optional(self.pool)
+        .await?;
+
+        if gongzuo_between.is_some() {
+            return Ok(Err(String::from(
+                "Gongzuo already exists during the period.",
+            )));
+        }
+
         let content_ids = sqlx::query!(
             r#"
             SELECT
@@ -376,6 +404,10 @@ impl GongzuoHandlerTrait for GongzuoHandler<'_> {
         gongzuo_id: i32,
         user_id: i32,
     ) -> anyhow::Result<Result<(), String>> {
+        println!(
+            "delete_gongzuo: gongzuo_id: {}, user_id: {}",
+            gongzuo_id, user_id
+        );
         let mut transaction = self.pool.begin().await?;
 
         // user_id が一致しなければrollbackする。
