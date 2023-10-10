@@ -2,3 +2,4 @@
 /web_backend/.env
 /web_backend/target
 /scripts/1_init_admin.sql
+/cert
