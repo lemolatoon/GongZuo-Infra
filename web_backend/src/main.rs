@@ -54,7 +54,7 @@ async fn main() {
         .unwrap_or(3001);
     let host: IpAddr = std::env::var("HOST")
         .map(|i| i.parse().unwrap())
-        .unwrap_or([127, 0, 0, 1].into());
+        .unwrap_or([0, 0, 0, 0].into());
 
     let addr = SocketAddr::from((host, port));
 
