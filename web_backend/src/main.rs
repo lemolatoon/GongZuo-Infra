@@ -70,7 +70,7 @@ async fn main() {
                         .join("letsencrypt")
                         .join("live")
                         .join("lemolatoon.ddns.net")
-                        .join("cert.pem"),
+                        .join("fullchain.pem"),
                 ),
             std::env::var("PRIVATE_KEY_PATH")
                 .map(|path| PathBuf::from(path))
