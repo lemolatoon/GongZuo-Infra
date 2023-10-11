@@ -83,6 +83,7 @@ async fn main() {
         )
         .await
         .unwrap();
+        println!("Listening on {}", &addr);
         axum_server::bind_rustls(addr, config)
             .serve(app.into_make_service())
             .await
