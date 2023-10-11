@@ -65,15 +65,19 @@ async fn main() {
             std::env::var("CERT_PATH")
                 .map(|path| PathBuf::from(path))
                 .unwrap_or(
-                    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                        .join("cert")
+                    PathBuf::from("/")
+                        .join("letsencrypt")
+                        .join("live")
+                        .join("lemolatoon.ddns.net")
                         .join("cert.pem"),
                 ),
             std::env::var("PRIVATE_KEY_PATH")
                 .map(|path| PathBuf::from(path))
                 .unwrap_or(
-                    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                        .join("cert")
+                    PathBuf::from("/")
+                        .join("letsencrypt")
+                        .join("live")
+                        .join("lemolatoon.ddns.net")
                         .join("privkey.pem"),
                 ),
         )
