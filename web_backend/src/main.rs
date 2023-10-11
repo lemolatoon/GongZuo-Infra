@@ -66,6 +66,7 @@ async fn main() {
                 .map(|path| PathBuf::from(path))
                 .unwrap_or(
                     PathBuf::from("/")
+                        .join("etc")
                         .join("letsencrypt")
                         .join("live")
                         .join("lemolatoon.ddns.net")
@@ -75,6 +76,7 @@ async fn main() {
                 .map(|path| PathBuf::from(path))
                 .unwrap_or(
                     PathBuf::from("/")
+                        .join("etc")
                         .join("letsencrypt")
                         .join("live")
                         .join("lemolatoon.ddns.net")
