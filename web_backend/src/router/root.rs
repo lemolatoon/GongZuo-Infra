@@ -8,10 +8,11 @@ use tower_http::cors::CorsLayer;
 use crate::{db, handlers, router};
 
 pub fn app_router(db: db::DB) -> Router {
-    let allowed_orgins: Vec<HeaderValue> = ["http://localhost:3000"]
-        .into_iter()
-        .map(|o| o.parse().unwrap())
-        .collect();
+    let allowed_orgins: Vec<HeaderValue> =
+        ["http://localhost:3000", "https://gongzuo-one.vercel.app"]
+            .into_iter()
+            .map(|o| o.parse().unwrap())
+            .collect();
 
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
